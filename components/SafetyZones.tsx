@@ -6,83 +6,60 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Search, ShieldAlert, BadgeAlert, Shield, Sun, Cloud, CloudRain } from 'lucide-react'
+import { MapPin, Search, ShieldAlert, BadgeAlert, Shield } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { useLanguage } from './LanguageContext'
+
+const karnatakaCities = [
+  'Bangalore', 'Mysore', 'Hubli-Dharwad', 'Mangalore', 'Belgaum',
+  'Gulbarga', 'Davanagere', 'Bellary', 'Bijapur', 'Shimoga'
+]
 
 interface SafetyZone {
   id: number
-  area: string
-  score: number
-  weather: {
-    condition: 'sunny' | 'cloudy' | 'rainy'
-    temperature: number
-    humidity: number
-  }
-  tips: string[]
-  image: string
+  name: string
+  type: 'hospital' | 'police' | 'public'
+  safetyLevel: 'safe' | 'moderate' | 'unsafe'
 }
 
 export default function SafetyZones() {
-  const { t } = useLanguage()
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [selectedCity, setSelectedCity] = useState('')
+  const [destination, setDestination] = useState('')
+  const [safetyZones, setSafetyZones] = useState<SafetyZone[]>([])
   const { toast } = useToast()
 
-  const safetyData: SafetyZone[] = [
-    {
-      id: 1,
-      area: "Puttur",
-      score: 95,
-      weather: { condition: 'sunny', temperature: 28, humidity: 65 },
-      tips: [
-        "Enjoy the serene Kumaradhara River",
-        "Visit the historic Mahalingeshwara Temple",
-        "Try local Malnad cuisine"
-      ],
-      image: "/placeholder.svg?height=150&width=300"
-    },
-    {
-      id: 2,
-      area: "Vittla",
-      score: 88,
-      weather: { condition: 'cloudy', temperature: 26, humidity: 70 },
-      tips: [
-        "Explore the beautiful Vittla Raj Temple",
-        "Participate in local cultural events",
-        "Visit nearby cashew plantations"
-      ],
-      image: "/placeholder.svg?height=150&width=300"
-    },
-    {
-      id: 3,
-      area: "Mangalore",
-      score: 82,
-      weather: { condition: 'rainy', temperature: 24, humidity: 80 },
-      tips: [
-        "Relax at Panambur Beach",
-        "Visit the famous Mangaladevi Temple",
-        "Try delicious Mangalorean seafood"
-      ],
-      image: "/placeholder.svg?height=150&width=300"
-    },
-  ]
-
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
+    const mockSafetyZones: SafetyZone[] = [
+      { id: 1, name: 'City Hospital', type: 'hospital', safetyLevel: 'safe' },
+      { id: 2, name: 'Central Police Station', type: 'police', safetyLevel: 'safe' },
+      { id: 3, name: 'Public Safe Spot', type: 'public', safetyLevel: 'moderate' },
+      { id: 4, name: 'Unsafe Area', type: 'public', safetyLevel: 'unsafe' },
+    ]
+    setSafetyZones(mockSafetyZones)
   }, [])
 
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500'
-    if (score >= 80) return 'text-yellow-500'
-    return 'text-red-500'
+  const handleSearch = () => {
+    if (!selectedCity || !destination) {
+      toast({
+        title: "Error",
+        description: "Please select a city and enter a destination.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    toast({
+      title: "Search Initiated",
+      description: `Searching for safe routes from ${selectedCity} to ${destination}.`,
+    })
+    // Here you would typically integrate with a mapping or routing service
   }
 
-  const getWeatherIcon = (condition: 'sunny' | 'cloudy' | 'rainy') => {
-    switch (condition) {
-      case 'sunny': return <Sun className="h-6 w-6 text-yellow-500" />
-      case 'cloudy': return <Cloud className="h-6 w-6 text-gray-500" />
-      case 'rainy': return <CloudRain className="h-6 w-6 text-blue-500" />
+  const getSafetyColor = (safetyLevel: string) => {
+    switch (safetyLevel) {
+      case 'safe': return 'bg-green-500'
+      case 'moderate': return 'bg-yellow-500'
+      case 'unsafe': return 'bg-red-500'
+      default: return 'bg-gray-500'
     }
   }
 
@@ -102,60 +79,72 @@ export default function SafetyZones() {
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Shield className="h-5 w-5 text-orange-500" />
-          {t('safetyZones')}
+          Safety Zones
         </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-gray-400 mb-6">
-          Explore our highlighted safety zones with real-time safety scores, weather information, and helpful tips for a safe and enjoyable experience.
+          Explore our highlighted safety zones with real-time safety scores and helpful tips for a safe and enjoyable experience.
         </p>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {safetyData.map((zone) => (
-            <motion.div
-              key={zone.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-lg overflow-hidden bg-gray-800 shadow-lg"
-            >
-              <div className="relative h-40">
-                <img src={zone.image} alt={zone.area} className="w-full h-full object-cover" />
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-gray-900 opacity-70"></div>
-                <div className="absolute bottom-2 left-2 flex items-center">
-                  <MapPin className="h-5 w-5 text-white mr-1" />
-                  <h3 className="font-semibold text-white text-lg">{zone.area}</h3>
-                </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <MapPin className="mr-2 h-5 w-5 text-orange-500" /> Safe Zones Map
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px] rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center text-gray-400">
+                <p>Safety zones visualization coming soon</p>
               </div>
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <p className={`text-2xl font-bold ${getScoreColor(zone.score)}`}>
-                    {zone.score}% Safe
-                  </p>
-                  <div className="flex items-center">
-                    {getWeatherIcon(zone.weather.condition)}
-                    <p className="text-sm text-gray-400 ml-2">{zone.weather.temperature}°C</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-400 mb-2">Updated: {currentTime.toLocaleTimeString()}</p>
-                <h4 className="text-white font-semibold mb-1">Local Tips:</h4>
-                <ul className="list-disc list-inside text-sm text-gray-400">
-                  {zone.tips.map((tip, index) => (
-                    <li key={index}>{tip}</li>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">Find Safe Routes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Select onValueChange={setSelectedCity}>
+                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectValue placeholder="Select a city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {karnatakaCities.map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
                   ))}
-                </ul>
-              </div>
-            </motion.div>
-          ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Enter your destination"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+              <Button onClick={handleSearch} className="w-full bg-orange-500 hover:bg-orange-600">
+                <Search className="mr-2 h-4 w-4" /> Find Safe Route
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-        <Button 
-          variant="outline" 
-          className="w-full mt-6 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-          onClick={() => window.location.href = '/safety-zones'}
-        >
-          {t('viewAllSafetyZones')}
-        </Button>
+
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold text-white mb-4">Safety Zones</h3>
+          <div className="space-y-4">
+            {safetyZones.map((zone) => (
+              <div key={zone.id} className="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
+                <div className="flex items-center">
+                  {getZoneIcon(zone.type)}
+                  <span className="ml-2 text-white">{zone.name}</span>
+                </div>
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${getSafetyColor(zone.safetyLevel)} ${zone.safetyLevel === 'moderate' ? 'text-gray-900' : 'text-white'}`}>
+                  {zone.safetyLevel.charAt(0).toUpperCase() + zone.safetyLevel.slice(1)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   )
 }
-
