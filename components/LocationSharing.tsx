@@ -6,44 +6,55 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Share } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import emailjs from '@emailjs/browser'
 
 export default function LocationSharing() {
   const [isSharing, setIsSharing] = useState(false)
   const { toast } = useToast()
 
-  const shareLocation = () => {
-    if (navigator.geolocation) {
-      setIsSharing(true)
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords
-          const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`
-          
-          // In a real app, you would send this to your emergency contacts
-          console.log('Location shared:', googleMapsUrl)
-          
-          toast({
-            title: "Location Shared",
-            description: "Your live location has been logged. In a real scenario, this would be shared with your emergency contacts.",
-          })
-          setIsSharing(false)
+  const shareLocation = async () => {
+    setIsSharing(true)
+
+    try {
+      // Puttur coordinates
+      const putturLocation = {
+        latitude: 12.7606,
+        longitude: 75.2006
+      }
+
+      const googleMapsUrl = `https://www.google.com/maps?q=${putturLocation.latitude},${putturLocation.longitude}`
+
+      // Send email using emailJS
+      const result = await emailjs.send(
+        'service_o17yyqp',
+        'template_0f6e8pl',
+        {
+          from_name: 'SafeWalk Location Sharing',
+          from_email: 'location@safewalk.com',
+          subject: 'Live Location Shared via SafeWalk',
+          message: `A user has shared their location with you.\n\nLocation: Puttur, Karnataka\nView on Google Maps: ${googleMapsUrl}\n\nThis is an automated message from SafeWalk's Location Sharing feature.`,
+          to_email: 'bhuvanshetty2018@gmail.com'
         },
-        (error) => {
-          console.error('Error getting location:', error)
-          toast({
-            title: "Error",
-            description: "Could not access location. Please enable location services.",
-            variant: "destructive",
-          })
-          setIsSharing(false)
-        }
+        'x2oCH1LfVilF8i5ij'
       )
-    } else {
+
+      if (result.text === 'OK') {
+        toast({
+          title: "Location Shared Successfully",
+          description: "Your live location has been shared via email.",
+        })
+      } else {
+        throw new Error('Failed to send email')
+      }
+    } catch (error) {
+      console.error('Error sharing location:', error)
       toast({
         title: "Error",
-        description: "Geolocation is not supported by your browser.",
+        description: "Failed to share location. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSharing(false)
     }
   }
 
@@ -74,4 +85,3 @@ export default function LocationSharing() {
     </Card>
   )
 }
-
