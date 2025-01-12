@@ -165,4 +165,3 @@ export default function Community({ onIncidentSubmit }: CommunityProps) {
     </Card>
   )
 }
-

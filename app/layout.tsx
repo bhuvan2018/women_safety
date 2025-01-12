@@ -15,32 +15,31 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
-  children,
+children,
 }: {
-  children: React.ReactNode
+children: React.ReactNode
 }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <Script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" />
-      </head>
-      <body className={`${inter.className} bg-gray-950 pt-20`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <LanguageProvider>
-            <TopBar />
-            <Navbar />
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8">
-              {children}
-            </main>
-            <SOS />
-            <Chatbot />
-            <AudioPlayer />
-            <Toaster />
-          </LanguageProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+return (
+  <html lang="en" suppressHydrationWarning>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <Script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" />
+    </head>
+    <body className={`${inter.className} bg-gray-950 pt-20`}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <LanguageProvider>
+          <TopBar />
+          <Navbar />
+          <main className="container mx-auto px-4 sm:px-6 lg:px-8">
+            {children}
+          </main>
+          <SOS />
+          <Chatbot />
+          <AudioPlayer />
+          <Toaster />
+        </LanguageProvider>
+      </ThemeProvider>
+    </body>
+  </html>
+)
 }
-

@@ -24,7 +24,7 @@ export default function Contact() {
     try {
       const result = await emailjs.send(
         'service_o17yyqp',
-        'template_881n1le',
+        'template_0f6e8pl',
         {
           from_name: name,
           from_email: email,
@@ -57,6 +57,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-gray-950 pt-24">
+      {/* Hero Section with Lady Justice Background */}
       <div className="relative h-[300px] bg-[url('/placeholder.svg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black/50">
           <div className="container mx-auto h-full flex items-center justify-center">
@@ -64,6 +65,8 @@ export default function Contact() {
           </div>
         </div>
       </div>
+
+      {/* Contact Form Section */}
       <div className="container mx-auto px-4 py-16">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -72,6 +75,7 @@ export default function Contact() {
           className="max-w-6xl mx-auto"
         >
           <div className="grid md:grid-cols-3 gap-8">
+            {/* Contact Form */}
             <div className="md:col-span-2 bg-gray-900 rounded-lg p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-8 text-orange-500">LET'S GET IN TOUCH</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -115,6 +119,8 @@ export default function Contact() {
                 </Button>
               </form>
             </div>
+
+            {/* Contact Information */}
             <div className="bg-orange-500 rounded-lg p-8 text-white">
               <div className="space-y-8">
                 <div className="flex items-center">
