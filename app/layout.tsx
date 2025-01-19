@@ -8,7 +8,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { LanguageProvider } from '@/components/LanguageContext'
 import SOS from '@/components/SOS'
 import Chatbot from '@/components/Chatbot'
-import AudioPlayer from '@/components/AudioPlayer'
 import Script from 'next/script'
 import './globals.css'
 
@@ -35,7 +34,6 @@ return (
           </main>
           <SOS />
           <Chatbot />
-          <AudioPlayer />
           <Toaster />
         </LanguageProvider>
       </ThemeProvider>

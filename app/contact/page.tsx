@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { MapPin, Phone, Mail } from 'lucide-react'
 import emailjs from '@emailjs/browser'
 import { useToast } from '@/hooks/use-toast'
+import Image from 'next/image'
 
 export default function Contact() {
   const [name, setName] = useState('')
@@ -57,12 +58,27 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-gray-950 pt-24">
-      {/* Hero Section with Lady Justice Background */}
-      <div className="relative h-[300px] bg-[url('/placeholder.svg')] bg-cover bg-center bg-no-repeat">
-        <div className="absolute inset-0 bg-black/50">
-          <div className="container mx-auto h-full flex items-center justify-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white">Contact Us</h1>
-          </div>
+      {/* Hero Section with Background Image */}
+      <div className="relative h-[300px] w-full">
+        <div className="absolute inset-0">
+          <Image
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bcad567c-ae77-4f5a-829a-b93f3cfaed57-Gy8ZwOXcbi5A2imffTUMO24dE2Mq11.jpeg"
+            alt="Emotional Portrait"
+            fill
+            className="object-cover opacity-40"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/50 to-gray-950"></div>
+        </div>
+        <div className="relative z-10 container mx-auto h-full flex items-center justify-center">
+          <motion.h1 
+            className="text-4xl md:text-5xl font-bold text-white text-center"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            Contact Us
+          </motion.h1>
         </div>
       </div>
 

@@ -30,17 +30,17 @@ export default function EmergencyHelplines() {
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-orange-500">
+      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center text-orange-500">
         DOMESTIC VIOLENCE | HELPLINES
       </h2>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {helplines.map((helpline, index) => (
           <Card key={index} className="bg-card">
             <CardHeader>
-              <CardTitle>{helpline.name}</CardTitle>
+              <CardTitle className="text-lg md:text-xl">{helpline.name}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">{helpline.description}</p>
+              <p className="text-sm md:text-base text-muted-foreground">{helpline.description}</p>
               <Button 
                 variant="outline" 
                 className="w-full border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
@@ -56,4 +56,3 @@ export default function EmergencyHelplines() {
     </motion.div>
   )
 }
-
