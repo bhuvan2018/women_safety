@@ -1,19 +1,19 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import EmergencyHelplines from '@/components/EmergencyHelplines'
-import AIStats from '@/components/AIStats'
-import LocationSharing from '@/components/LocationSharing'
-import SafetyZones from '@/components/SafetyZones'
-import SafetyChallenges from '@/components/SafetyChallenges'
-import CrowdsourcedData from '@/components/CrowdsourcedData'
-import Community from '@/components/Community'
-import LoadingAnimation from '@/components/LoadingAnimation'
-import { useLanguage } from '@/components/LanguageContext'
-import AudioPlayer from '@/components/AudioPlayer'
-import SafetyRating from '@/components/SafetyRating'
-import Image from 'next/image'
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import EmergencyHelplines from "@/components/EmergencyHelplines"
+import AIStats from "@/components/AIStats"
+import LocationSharing from "@/components/LocationSharing"
+import SafetyZones from "./safety-zones/page"
+import SafetyChallenges from "@/components/SafetyChallenges"
+import CrowdsourcedData from "@/components/CrowdsourcedData"
+import Community from "@/components/Community"
+import LoadingAnimation from "@/components/LoadingAnimation"
+import { useLanguage } from "@/components/LanguageContext"
+import AudioPlayer from "@/components/AudioPlayer"
+import SafetyRating from "@/components/SafetyRating"
+import Image from "next/image"
 
 const AnimatedText = ({ text, className }: { text: string; className?: string }) => {
   return (
@@ -25,14 +25,14 @@ const AnimatedText = ({ text, className }: { text: string; className?: string })
         visible: { transition: { staggerChildren: 0.02 } },
       }}
     >
-      {text.split('').map((char, index) => (
+      {text.split("").map((char, index) => (
         <motion.span
           key={`${char}-${index}`}
           variants={{
             hidden: { opacity: 0, x: 20 },
             visible: { opacity: 1, x: 0 },
           }}
-          transition={{ type: 'spring', damping: 12, stiffness: 100 }}
+          transition={{ type: "spring", damping: 12, stiffness: 100 }}
         >
           {char}
         </motion.span>
@@ -43,7 +43,7 @@ const AnimatedText = ({ text, className }: { text: string; className?: string })
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [currentDescription, setCurrentDescription] = useState('safeWalkDescription')
+  const [currentDescription, setCurrentDescription] = useState("safeWalkDescription")
   const { t } = useLanguage()
   const [hasSubmittedIncident, setHasSubmittedIncident] = useState(false)
 
@@ -57,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentDescription(prev => prev === 'safeWalkDescription' ? 'missionDescription' : 'safeWalkDescription')
+      setCurrentDescription((prev) => (prev === "safeWalkDescription" ? "missionDescription" : "safeWalkDescription"))
     }, 10000)
 
     return () => clearInterval(interval)
@@ -103,11 +103,9 @@ export default function Home() {
                     className="text-center mb-8 md:mb-16"
                   >
                     <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-4 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-transparent bg-clip-text">
-                      {t('youAreNotAlone')}
+                      {t("youAreNotAlone")}
                     </h1>
-                    <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground">
-                      {t('itIsNotYourFault')}
-                    </p>
+                    <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground">{t("itIsNotYourFault")}</p>
                   </motion.div>
 
                   {/* Content container */}
@@ -122,18 +120,18 @@ export default function Home() {
                         className="relative"
                       >
                         {/* Centered title */}
-                        <motion.h2 
+                        <motion.h2
                           className="text-2xl md:text-3xl lg:text-4xl font-bold text-orange-500 text-center mb-4 md:mb-6"
                           initial={{ opacity: 0, y: -20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.2, duration: 0.5 }}
                         >
-                          {currentDescription === 'safeWalkDescription' ? 'SafeWalk' : t('ourMission')}
+                          {currentDescription === "safeWalkDescription" ? "SafeWalk" : t("ourMission")}
                         </motion.h2>
 
                         {/* Right-aligned description */}
                         <div className="text-right">
-                          <AnimatedText 
+                          <AnimatedText
                             text={t(currentDescription)}
                             className="text-sm md:text-base lg:text-lg text-muted-foreground leading-relaxed max-w-2xl ml-auto"
                           />
@@ -143,10 +141,10 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
 
             <EmergencyHelplines />
-              
+
             <div className="grid md:grid-cols-2 gap-4 md:gap-8 mt-8 md:mt-12">
               <LocationSharing />
               <AIStats />
@@ -162,10 +160,7 @@ export default function Home() {
             </div>
 
             <div className="mt-8 md:mt-12">
-              <SafetyChallenges 
-                onIncidentReportClick={() => {}} 
-                hasSubmittedIncident={hasSubmittedIncident}
-              />
+              <SafetyChallenges onIncidentReportClick={() => {}} hasSubmittedIncident={hasSubmittedIncident} />
             </div>
 
             <div className="mt-8 md:mt-12">
