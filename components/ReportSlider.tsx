@@ -1,12 +1,12 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { X } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { X } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface ReportSliderProps {
   isOpen: boolean
@@ -26,19 +26,19 @@ interface Report {
 
 export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSliderProps) {
   const [step, setStep] = useState(0)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [contact, setContact] = useState('')
-  const [complaint, setComplaint] = useState('')
-  const [helpRequest, setHelpRequest] = useState('')
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [contact, setContact] = useState("")
+  const [complaint, setComplaint] = useState("")
+  const [helpRequest, setHelpRequest] = useState("")
   const { toast } = useToast()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const content = step === 3 ? complaint : helpRequest
-    const type = step === 3 ? 'complaint' : 'help'
-    
+    const type = step === 3 ? "complaint" : "help"
+
     const newReport: Report = {
       id: Date.now(),
       name,
@@ -46,23 +46,23 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
       contact,
       type,
       content,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     }
-    
-    const storedReports = localStorage.getItem('navbarReports')
+
+    const storedReports = localStorage.getItem("navbarReports")
     const reports = storedReports ? JSON.parse(storedReports) : []
     const updatedReports = [newReport, ...reports]
-    localStorage.setItem('navbarReports', JSON.stringify(updatedReports))
-    
+    localStorage.setItem("navbarReports", JSON.stringify(updatedReports))
+
     toast({
       title: "Report Submitted",
       description: "Your message has been saved successfully.",
     })
-    setName('')
-    setEmail('')
-    setContact('')
-    setComplaint('')
-    setHelpRequest('')
+    setName("")
+    setEmail("")
+    setContact("")
+    setComplaint("")
+    setHelpRequest("")
     setStep(0)
     onSubmit()
     onClose()
@@ -81,7 +81,7 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
         }
         break
       case 1:
-        if (!email.trim() || !email.includes('@')) {
+        if (!email.trim() || !email.includes("@")) {
           toast({
             title: "Valid Email Required",
             description: "Please enter a valid email address before proceeding.",
@@ -133,14 +133,7 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
   const steps = [
     {
       title: "Your Name",
-      content: (
-        <Input
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      )
+      content: <Input placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} required />,
     },
     {
       title: "Your Email",
@@ -152,7 +145,7 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-      )
+      ),
     },
     {
       title: "Your Contact",
@@ -163,7 +156,7 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
           onChange={(e) => setContact(e.target.value)}
           required
         />
-      )
+      ),
     },
     {
       title: "Register your complaint",
@@ -175,7 +168,7 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
           className="min-h-[200px]"
           required
         />
-      )
+      ),
     },
     {
       title: "Ask for Help",
@@ -187,18 +180,18 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
           className="min-h-[200px]"
           required
         />
-      )
-    }
+      ),
+    },
   ]
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ x: '-100%' }}
+          initial={{ x: "-100%" }}
           animate={{ x: 0 }}
-          exit={{ x: '-100%' }}
-          transition={{ type: 'tween' }}
+          exit={{ x: "-100%" }}
+          transition={{ type: "tween" }}
           className="fixed inset-y-0 left-0 w-full sm:w-96 bg-background border-r border-border shadow-lg z-50"
         >
           <div className="p-6">
@@ -208,10 +201,10 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
                 <X className="h-6 w-6" />
               </Button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {steps[step].content}
-              
+
               <div className="flex justify-between">
                 <Button
                   type="button"
@@ -221,18 +214,13 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
                 >
                   Previous
                 </Button>
-                
+
                 {step < steps.length - 1 ? (
-                  <Button
-                    type="button"
-                    onClick={handleNext}
-                  >
+                  <Button type="button" onClick={handleNext}>
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit">
-                    Submit
-                  </Button>
+                  <Button type="submit">Submit</Button>
                 )}
               </div>
             </form>
@@ -242,4 +230,3 @@ export default function ReportSlider({ isOpen, onClose, onSubmit }: ReportSlider
     </AnimatePresence>
   )
 }
-
