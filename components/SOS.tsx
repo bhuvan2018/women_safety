@@ -13,7 +13,6 @@ export default function SOS() {
   const [countdown, setCountdown] = useState(5)
   const router = useRouter()
   const { toast } = useToast()
-
   useEffect(() => {
     let timer: NodeJS.Timeout
     if (isActive && countdown > 0) {
