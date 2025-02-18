@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,9 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPin, Search, ShieldAlert, BadgeAlert, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import dynamic from "next/dynamic"
-import L from "leaflet"
 
-const Map = dynamic(() => import("./Map"), { ssr: false })
+// Dynamically import the Map component with SSR disabled
+// components/SafetyZones.tsx
+
+interface MapProps {
+  routes: Route[];
+}
+
+const Map = dynamic(
+  () => import("@/components/Map").then((mod) => mod.default),
+  { 
+    ssr: false,
+    loading: () => <div className="h-[400px] w-full bg-gray-800 rounded-lg animate-pulse" />
+  }
+) as React.ForwardRefExoticComponent<MapProps & React.RefAttributes<L.Map>>;
 
 const karnatakaCities = [
   "Bangalore",
@@ -45,7 +57,7 @@ export default function SafetyZones() {
   const [destination, setDestination] = useState("")
   const [routes, setRoutes] = useState<Route[]>([])
   const { toast } = useToast()
-  const mapRef = useRef<L.Map | null>(null)
+  const mapRef = useRef<any>(null) // Use `any` to avoid SSR type issues
 
   const handleSearch = async () => {
     if (!selectedCity || !destination) {
@@ -85,8 +97,9 @@ export default function SafetyZones() {
         description: `Three safe routes from ${selectedCity} to ${destination} have been calculated.`,
       })
 
-      // Update map view
-      if (mapRef.current) {
+      // Update map view (only on the client side)
+      if (typeof window !== "undefined" && mapRef.current) {
+        const L = await import("leaflet") // Dynamically import Leaflet
         const map = mapRef.current
         const allPoints = newRoutes.flatMap((route) => route.path)
         const bounds = L.latLngBounds(allPoints)
@@ -230,4 +243,3 @@ export default function SafetyZones() {
     </div>
   )
 }
-
