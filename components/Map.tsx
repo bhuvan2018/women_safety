@@ -1,26 +1,28 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import { MapContainer, TileLayer, Polyline, useMap, Popup, Marker } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect, forwardRef, useImperativeHandle, useRef } from "react"
+import L from "leaflet"
+import { MapContainer, TileLayer, Polyline, useMap, Popup, Marker } from "react-leaflet"
+import "leaflet/dist/leaflet.css"
 
 interface SafetyZone {
-  id: number;
-  name: string;
-  type: "hospital" | "police" | "public";
-  latitude: number;
-  longitude: number;
-  safetyLevel: "safe" | "moderate" | "unsafe";
+  id: number
+  name: string
+  type: "hospital" | "police" | "public"
+  latitude: number
+  longitude: number
+  safetyLevel: "safe" | "moderate" | "unsafe"
+  landmark?: string
 }
 
 interface Route {
-  path: [number, number][];
-  safetyZones: SafetyZone[];
+  path: [number, number][]
+  safetyZones: SafetyZone[]
+  routeDescription: string
 }
 
 interface MapProps {
-  routes: Route[];
+  routes: Route[]
 }
 
 const createCustomIcon = (color: string) => {
@@ -29,61 +31,49 @@ const createCustomIcon = (color: string) => {
     html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>`,
     iconSize: [20, 20],
     iconAnchor: [10, 10],
-  });
-};
+  })
+}
 
-const MapComponent = ({ routes }: MapProps) => {
-  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const center: [number, number] = [12.9716, 77.5946]; // Bangalore coordinates
+const MapComponent = forwardRef<L.Map, MapProps>(({ routes }, ref) => {
+  const center: [number, number] = [12.9716, 77.5946] // Bangalore coordinates
 
-  useEffect(() => {
-    setIsMounted(true);
-    return () => {
-      setIsMounted(false);
-      if (mapInstance) {
-        mapInstance.remove();
-      }
-    };
-  }, []);
+  useImperativeHandle(ref, () => {
+    return mapRef.current as L.Map
+  })
+
+  const mapRef = useRef<L.Map | null>(null)
 
   const getSafetyColor = (safetyLevel: string) => {
     switch (safetyLevel) {
       case "safe":
-        return "green";
+        return "green"
       case "moderate":
-        return "yellow";
+        return "yellow"
       case "unsafe":
-        return "red";
+        return "red"
       default:
-        return "gray";
+        return "gray"
     }
-  };
-
-  const routeColors = ["#3388ff", "#ff3388", "#88ff33"];
-
-  if (!isMounted) {
-    return <div className="h-[400px] w-full bg-gray-800 rounded-lg animate-pulse" />;
   }
 
+  const routeColors = ["#3388ff", "#ff3388", "#88ff33", "#ff8833", "#33ff88"]
+
   return (
-    <MapContainer
-      key={JSON.stringify(routes)} // Force reinitialization when routes change
-      center={center}
-      zoom={13}
-      style={{ height: "100%", width: "100%" }}
-      whenReady={() => setMapInstance(mapInstance)}
-    >
+    <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }} ref={mapRef}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <MapController routes={routes} />
       {routes.map((route, index) => (
         <div key={index}>
           <Polyline
             positions={route.path}
-            pathOptions={{ color: routeColors[index], weight: 5, opacity: 0.7 }}
+            pathOptions={{
+              color: routeColors[index],
+              weight: 5,
+              opacity: 0.7,
+              dashArray: route.routeDescription.includes("fastest") ? "10, 10" : undefined,
+            }}
           />
           {route.safetyZones.map((zone) => (
             <Marker
@@ -92,28 +82,40 @@ const MapComponent = ({ routes }: MapProps) => {
               icon={createCustomIcon(getSafetyColor(zone.safetyLevel))}
             >
               <Popup>
-                Route {index + 1}: {zone.name} - {zone.safetyLevel}
+                <div className="text-sm">
+                  <p className="font-semibold">{zone.name}</p>
+                  <p className="text-gray-600">{zone.landmark}</p>
+                  <p className="capitalize mt-1">
+                    Route {index + 1} - {zone.type}
+                  </p>
+                  <p className={`mt-1 font-medium text-${getSafetyColor(zone.safetyLevel).replace("bg-", "")}`}>
+                    Safety: {zone.safetyLevel}
+                  </p>
+                </div>
               </Popup>
             </Marker>
           ))}
         </div>
       ))}
+      <MapController routes={routes} />
     </MapContainer>
-  );
-};
+  )
+})
+
+MapComponent.displayName = "MapComponent"
 
 const MapController = ({ routes }: { routes: Route[] }) => {
-  const map = useMap();
+  const map = useMap()
 
   useEffect(() => {
     if (routes.length > 0) {
-      const allPoints = routes.flatMap((route) => route.path);
-      const bounds = L.latLngBounds(allPoints);
-      map.fitBounds(bounds, { padding: [50, 50] });
+      const allPoints = routes.flatMap((route) => route.path)
+      const bounds = L.latLngBounds(allPoints)
+      map.fitBounds(bounds)
     }
-  }, [map, routes]);
+  }, [map, routes])
 
-  return null;
-};
+  return null
+}
 
-export default MapComponent;
+export default MapComponent
