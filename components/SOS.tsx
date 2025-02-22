@@ -4,15 +4,33 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
 import emailjs from "@emailjs/browser"
+
+const saveSOSAlert = (location: { name: string; latitude: number; longitude: number }) => {
+  const sosAlert = {
+    id: Date.now(),
+    type: "SOS Alert",
+    content: `SOS Alert triggered at ${location.name} (${location.latitude}, ${location.longitude})`,
+    created_at: new Date().toISOString(),
+    user: {
+      name: "User", // In a real app, you'd get this from the authenticated user
+      email: "user@example.com", // In a real app, you'd get this from the authenticated user
+    },
+  }
+
+  const storedAlerts = localStorage.getItem("sosAlerts")
+  const alerts = storedAlerts ? JSON.parse(storedAlerts) : []
+  alerts.unshift(sosAlert)
+  localStorage.setItem("sosAlerts", JSON.stringify(alerts))
+}
 
 export default function SOS() {
   const [isActive, setIsActive] = useState(false)
   const [countdown, setCountdown] = useState(5)
   const router = useRouter()
   const { toast } = useToast()
+
   useEffect(() => {
     let timer: NodeJS.Timeout
     if (isActive && countdown > 0) {
@@ -53,6 +71,8 @@ Map Link: ${googleMapsUrl}`,
         },
         "x2oCH1LfVilF8i5ij",
       )
+
+      saveSOSAlert(location)
 
       console.log("Email sent:", result.text)
       toast({
