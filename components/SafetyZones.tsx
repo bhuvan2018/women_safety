@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,21 +9,65 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPin, Search, ShieldAlert, BadgeAlert, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import dynamic from "next/dynamic"
+import L from "leaflet"
 
-// Dynamically import the Map component with SSR disabled
-// components/SafetyZones.tsx
+const Map = dynamic(() => import("./Map"), { ssr: false })
 
-interface MapProps {
-  routes: Route[];
+// Location names database for Karnataka
+const locationNames = {
+  Bangalore: [
+    "Indiranagar",
+    "Koramangala",
+    "MG Road",
+    "Brigade Road",
+    "Jayanagar",
+    "JP Nagar",
+    "Whitefield",
+    "HSR Layout",
+    "BTM Layout",
+    "Marathahalli",
+    "Electronic City",
+    "Banashankari",
+    "Malleswaram",
+    "Rajajinagar",
+    "Hebbal",
+    "Bannerghatta Road",
+    "Yelahanka",
+    "RT Nagar",
+    "Basavanagudi",
+    "Vijayanagar",
+  ],
+  Mysore: [
+    "Gokulam",
+    "Saraswathipuram",
+    "VV Mohalla",
+    "Lakshmipuram",
+    "Jayalakshmipuram",
+    "Kuvempunagar",
+    "Vijayanagar",
+    "Hebbal",
+    "RK Nagar",
+    "Bogadi",
+    "Bannimantap",
+    "Nazarbad",
+    "Chamundipuram",
+    "Agrahara",
+    "Mandi Mohalla",
+  ],
+  "Hubli-Dharwad": [
+    "Vidyanagar",
+    "Navanagar",
+    "Gopankoppa",
+    "Keshwapur",
+    "Deshpande Nagar",
+    "Malmaddi",
+    "Saptapur",
+    "Renuka Nagar",
+    "Gandhi Nagar",
+    "Sattur",
+  ],
+  // Add more cities and their locations as needed
 }
-
-const Map = dynamic(
-  () => import("@/components/Map").then((mod) => mod.default),
-  { 
-    ssr: false,
-    loading: () => <div className="h-[400px] w-full bg-gray-800 rounded-lg animate-pulse" />
-  }
-) as React.ForwardRefExoticComponent<MapProps & React.RefAttributes<L.Map>>;
 
 const karnatakaCities = [
   "Bangalore",
@@ -45,11 +89,13 @@ interface SafetyZone {
   latitude: number
   longitude: number
   safetyLevel: "safe" | "moderate" | "unsafe"
+  landmark?: string
 }
 
 interface Route {
   path: [number, number][]
   safetyZones: SafetyZone[]
+  routeDescription: string
 }
 
 export default function SafetyZones() {
@@ -57,7 +103,37 @@ export default function SafetyZones() {
   const [destination, setDestination] = useState("")
   const [routes, setRoutes] = useState<Route[]>([])
   const { toast } = useToast()
-  const mapRef = useRef<any>(null) // Use `any` to avoid SSR type issues
+  const mapRef = useRef<L.Map | null>(null)
+
+  const getRandomLocationName = (city: string, usedNames: Set<string>): string => {
+    const cityLocations = locationNames[city as keyof typeof locationNames] || locationNames["Bangalore"]
+    const availableLocations = cityLocations.filter((name) => !usedNames.has(name))
+
+    if (availableLocations.length === 0) {
+      // If all names are used, create a unique name with a number
+      const baseLocation = cityLocations[Math.floor(Math.random() * cityLocations.length)]
+      let counter = 1
+      while (usedNames.has(`${baseLocation} ${counter}`)) {
+        counter++
+      }
+      return `${baseLocation} ${counter}`
+    }
+
+    const randomLocation = availableLocations[Math.floor(Math.random() * availableLocations.length)]
+    usedNames.add(randomLocation)
+    return randomLocation
+  }
+
+  const getLandmarkName = (type: "hospital" | "police" | "public", locationName: string): string => {
+    switch (type) {
+      case "hospital":
+        return `${locationName} Medical Center`
+      case "police":
+        return `${locationName} Police Station`
+      case "public":
+        return `${locationName} Community Center`
+    }
+  }
 
   const handleSearch = async () => {
     if (!selectedCity || !destination) {
@@ -70,7 +146,6 @@ export default function SafetyZones() {
     }
 
     try {
-      // Simulate API call for route calculation
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${selectedCity},Karnataka,India`,
       )
@@ -83,23 +158,23 @@ export default function SafetyZones() {
       const destData = await destResponse.json()
       const destCoords = [Number.parseFloat(destData[0].lat), Number.parseFloat(destData[0].lon)]
 
-      // Generate three different routes
+      const usedNames = new Set<string>()
       const newRoutes: Route[] = []
-      for (let i = 0; i < 3; i++) {
+
+      for (let i = 0; i < 5; i++) {
         const simulatedRoute = generateSimulatedRoute(cityCoords as [number, number], destCoords as [number, number])
-        const safetyZones = generateSafetyMarkers(simulatedRoute)
-        newRoutes.push({ path: simulatedRoute, safetyZones })
+        const safetyZones = generateSafetyMarkers(simulatedRoute, selectedCity, usedNames)
+        const routeDescription = `Via ${safetyZones[Math.floor(safetyZones.length / 2)].name}`
+        newRoutes.push({ path: simulatedRoute, safetyZones, routeDescription })
       }
       setRoutes(newRoutes)
 
       toast({
         title: "Routes Calculated",
-        description: `Three safe routes from ${selectedCity} to ${destination} have been calculated.`,
+        description: `Five safe routes from ${selectedCity} to ${destination} have been calculated.`,
       })
 
-      // Update map view (only on the client side)
-      if (typeof window !== "undefined" && mapRef.current) {
-        const L = await import("leaflet") // Dynamically import Leaflet
+      if (mapRef.current) {
         const map = mapRef.current
         const allPoints = newRoutes.flatMap((route) => route.path)
         const bounds = L.latLngBounds(allPoints)
@@ -117,27 +192,37 @@ export default function SafetyZones() {
 
   const generateSimulatedRoute = (start: [number, number], end: [number, number]): [number, number][] => {
     const route: [number, number][] = [start]
-    const numPoints = Math.floor(Math.random() * 3) + 3 // 3 to 5 points
+    const numPoints = Math.floor(Math.random() * 3) + 3
     for (let i = 1; i < numPoints; i++) {
       const fraction = i / numPoints
-      const lat = start[0] + (end[0] - start[0]) * fraction + (Math.random() - 0.5) * 0.01
-      const lon = start[1] + (end[1] - start[1]) * fraction + (Math.random() - 0.5) * 0.01
+      const variation = 0.015 * (Math.random() - 0.5) * (5 - i)
+      const lat = start[0] + (end[0] - start[0]) * fraction + variation
+      const lon = start[1] + (end[1] - start[1]) * fraction + variation
       route.push([lat, lon])
     }
     route.push(end)
     return route
   }
 
-  const generateSafetyMarkers = (route: [number, number][]): SafetyZone[] => {
+  const generateSafetyMarkers = (route: [number, number][], city: string, usedNames: Set<string>): SafetyZone[] => {
     const safetyLevels: ("safe" | "moderate" | "unsafe")[] = ["safe", "moderate", "unsafe"]
-    return route.map((coords, index) => ({
-      id: index,
-      name: `Location ${index + 1}`,
-      type: "public",
-      latitude: coords[0],
-      longitude: coords[1],
-      safetyLevel: safetyLevels[Math.floor(Math.random() * safetyLevels.length)],
-    }))
+    const types: ("hospital" | "police" | "public")[] = ["hospital", "police", "public"]
+
+    return route.map((coords, index) => {
+      const type = types[Math.floor(Math.random() * types.length)]
+      const locationName = getRandomLocationName(city, usedNames)
+      const landmark = getLandmarkName(type, locationName)
+
+      return {
+        id: index,
+        name: locationName,
+        type,
+        latitude: coords[0],
+        longitude: coords[1],
+        safetyLevel: safetyLevels[Math.floor(Math.random() * safetyLevels.length)],
+        landmark,
+      }
+    })
   }
 
   const getSafetyColor = (safetyLevel: string) => {
@@ -209,28 +294,33 @@ export default function SafetyZones() {
           {routes.length > 0 && (
             <div className="mt-8">
               <h3 className="text-xl font-semibold text-white mb-4">Safety Zones</h3>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {routes.map((route, routeIndex) => (
-                  <div key={routeIndex}>
-                    <h4 className="text-lg font-semibold text-orange-500 mb-2">Route {routeIndex + 1}</h4>
+                  <div key={routeIndex} className="bg-gray-800/50 p-4 rounded-lg">
+                    <h4 className="text-lg font-semibold text-orange-500 mb-3">
+                      Route {routeIndex + 1} - {route.routeDescription}
+                    </h4>
                     {route.safetyZones.map((zone) => (
                       <motion.div
                         key={`${routeIndex}-${zone.id}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center justify-between bg-gray-800 p-3 rounded-lg mb-2"
+                        className="flex flex-col bg-gray-800 p-3 rounded-lg mb-2"
                       >
-                        <div className="flex items-center">
-                          {getZoneIcon(zone.type)}
-                          <span className="ml-2 text-white">{zone.name}</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center">
+                            {getZoneIcon(zone.type)}
+                            <span className="ml-2 text-white font-medium">{zone.name}</span>
+                          </div>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-semibold ${getSafetyColor(
+                              zone.safetyLevel,
+                            )} ${zone.safetyLevel === "moderate" ? "text-gray-900" : "text-white"}`}
+                          >
+                            {zone.safetyLevel.charAt(0).toUpperCase() + zone.safetyLevel.slice(1)}
+                          </span>
                         </div>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${getSafetyColor(
-                            zone.safetyLevel,
-                          )} ${zone.safetyLevel === "moderate" ? "text-gray-900" : "text-white"}`}
-                        >
-                          {zone.safetyLevel.charAt(0).toUpperCase() + zone.safetyLevel.slice(1)}
-                        </span>
+                        <span className="text-sm text-gray-400 ml-7">{zone.landmark}</span>
                       </motion.div>
                     ))}
                   </div>
