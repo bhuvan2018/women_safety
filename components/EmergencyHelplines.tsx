@@ -1,35 +1,34 @@
-'use client'
+"use client"
 
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Phone } from 'lucide-react'
+import { motion } from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Phone } from "lucide-react"
 
 export default function EmergencyHelplines() {
   const helplines = [
     {
-      name: "AZAD FOUNDATION",
-      number: "+911140601878",
-      description: "Driven by the vision of a world where all women enjoy full citizenship, earn a livelihood with dignity and generate wealth and value for all."
+      name: "SHAKTI SHALINI",
+      number: "+10920 or (011) 24373736",
+      description:
+        "Driven by the vision of a world where all women enjoy full citizenship, earn a livelihood with dignity and generate wealth and value for all.",
     },
     {
-      name: "OPERATION PEACEMAKER",
-      number: "18002129131",
-      description: "Aims to reduce domestic violence through thousands of PeaceMakers who are trained in family and marriage counseling and all aspects of the Domestic Violence Act."
+      name: "WOMEN POLICE STATION",
+      number: "+918251233500",
+      description:
+        "Aims to reduce domestic violence through thousands of PeaceMakers who are trained in family and marriage counseling and all aspects of the Domestic Violence Act.",
     },
     {
-      name: "AKS FOUNDATION",
-      number: "8793088814",
-      description: "Provides support to victims, from all over the country and abroad, of abuse and violence in order to empower them to become survivors."
-    }
+      name: "CHILD WELFARE COMMITTEE",
+      number: "08251230388",
+      description:
+        "Provides support to victims, from all over the country and abroad, of abuse and violence in order to empower them to become survivors.",
+    },
   ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
       <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center text-orange-500">
         DOMESTIC VIOLENCE | HELPLINES
       </h2>
@@ -41,10 +40,10 @@ export default function EmergencyHelplines() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm md:text-base text-muted-foreground">{helpline.description}</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                onClick={() => window.location.href = `tel:${helpline.number}`}
+                onClick={() => (window.location.href = `tel:${helpline.number}`)}
               >
                 <Phone className="mr-2 h-4 w-4" />
                 {helpline.number}
