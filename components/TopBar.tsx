@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { Github, Linkedin, Instagram } from 'lucide-react'
+import { Github, Linkedin, Instagram } from "lucide-react"
 
 export default function TopBar() {
   return (
@@ -24,4 +24,3 @@ export default function TopBar() {
     </div>
   )
 }
-
