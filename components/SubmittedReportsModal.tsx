@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { X } from 'lucide-react'
+"use client"
+
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { X } from "lucide-react"
 
 interface SubmittedReportsModalProps {
   isOpen: boolean
@@ -22,7 +24,7 @@ export default function SubmittedReportsModal({ isOpen, onClose }: SubmittedRepo
   const [reports, setReports] = useState<Report[]>([])
 
   useEffect(() => {
-    const storedReports = localStorage.getItem('navbarReports')
+    const storedReports = localStorage.getItem("navbarReports")
     if (storedReports) {
       setReports(JSON.parse(storedReports))
     }
@@ -58,11 +60,11 @@ export default function SubmittedReportsModal({ isOpen, onClose }: SubmittedRepo
                     <p className="font-semibold">{report.name}</p>
                     <p className="text-sm text-muted-foreground">Email: {report.email}</p>
                     <p className="text-sm text-muted-foreground">Contact: {report.contact}</p>
-                    <p className="mt-2"><strong>Type:</strong> {report.type}</p>
-                    <p className="mt-2">{report.content}</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {new Date(report.created_at).toLocaleString()}
+                    <p className="mt-2">
+                      <strong>Type:</strong> {report.type}
                     </p>
+                    <p className="mt-2">{report.content}</p>
+                    <p className="text-sm text-muted-foreground mt-2">{new Date(report.created_at).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
