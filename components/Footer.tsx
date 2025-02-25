@@ -34,16 +34,14 @@ export default function Footer() {
               <Heart className="w-4 h-4 text-red-500 fill-current" />
             </motion.div>
             <span>to protect women by</span>
-            <motion.a
+            <a
               href="https://github.com/bhuvan2018"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-orange-500 hover:text-orange-400 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="text-orange-500 hover:text-orange-400 transition-colors hover:scale-105 active:scale-95"
             >
               Bhuvan Shetty
-            </motion.a>
+            </a>
           </div>
           <p className="text-gray-600 text-sm mt-2">© {new Date().getFullYear()} SafeWalk. All rights reserved.</p>
         </div>
