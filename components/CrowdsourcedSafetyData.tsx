@@ -149,10 +149,9 @@ export default function CrowdsourcedSafetyData() {
             <label className="text-sm text-gray-400 mb-1 block">Safety Features</label>
             <div className="flex flex-wrap gap-2 mb-2">
               {availableTags.map((tag) => (
-                <Badge
+                <div
                   key={tag.value}
-                  variant={selectedTags.includes(tag.value) ? "default" : "outline"}
-                  className={`cursor-pointer ${selectedTags.includes(tag.value) ? tag.color : "hover:bg-gray-700"}`}
+                  className={`badge cursor-pointer ${selectedTags.includes(tag.value) ? tag.color : "hover:bg-gray-700"}`}
                   onClick={() => {
                     setSelectedTags((prev) =>
                       prev.includes(tag.value) ? prev.filter((t) => t !== tag.value) : [...prev, tag.value],
@@ -160,7 +159,7 @@ export default function CrowdsourcedSafetyData() {
                   }}
                 >
                   {tag.label}
-                </Badge>
+                </div>
               ))}
             </div>
           </div>
