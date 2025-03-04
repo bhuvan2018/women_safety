@@ -3,16 +3,16 @@
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { useLanguage } from "./LanguageContext"
+import { useLanguage } from "@/components/LanguageContext"
 import { Menu, X } from "lucide-react"
-import ReportSlider from "./ReportSlider"
-import SubmittedReportsModal from "./SubmittedReportsModal"
+import ReportSlider from "@/components/ReportSlider"
+import SubmittedReportsModal from "@/components/SubmittedReportsModal"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import type React from "react"
-import { useAuth } from "@/contexts/AuthContext"
+import useAuth from "@/hooks/useAuth"
 
 export default function Navbar() {
   const { t } = useLanguage()
