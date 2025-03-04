@@ -21,7 +21,8 @@
   --destructive-foreground: 0 0% 98%;
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --ring: 24 75% 50%; /* Orange-based ring color */
+  --radius: 0.75rem; /* Slightly larger border radius */
 }
 
 body {
@@ -48,6 +49,42 @@ body {
   --destructive-foreground: 0 0% 98%;
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --ring: 24 75% 50%;
 }
 
+/* Custom focus styles for better accessibility */
+*:focus-visible {
+  @apply outline-none ring-2 ring-orange-500 ring-offset-2 ring-offset-gray-950;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600;
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  @apply transition-all duration-200;
+}
+
+/* Gradient text utility class */
+.gradient-text {
+  @apply bg-gradient-to-r from-orange-500 to-red-500 text-transparent bg-clip-text;
+}
